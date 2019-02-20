@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
+    integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  <script>
+    let history = '';
+    if (!!window.EventSource) {
+      var source = new EventSource('/api/accounts/events')
+
+      source.addEventListener('message', function (e) {
+        let data = JSON.parse(e.data);
+        const name = data.payload.Name || ' - ';
+        const site = data.payload.Site || ' - ';
+        const phone = data.payload.Phone || ' - ';
+        const type = data.payload.ChangeEventHeader.changeType;
+        const raw = JSON.stringify(data, null, 2);
+        document.getElementById('name').innerHTML = name;
+        document.getElementById('site').innerHTML = site;
+        document.getElementById('phone').innerHTML = phone;
+        document.getElementById('type').innerHTML = type;
+        document.getElementById('raw').innerHTML = raw;
+        history += `<li class="list-group-item">${data.event.replayId} - ${type}</li>`;
+        document.getElementById('history').innerHTML = history;
+      }, false)
+
+      source.addEventListener('status', function (e) {
+        document.getElementById('status').innerHTML = e.data
+      }, false)
+
+      source.addEventListener('open', function (e) {
+        document.getElementById('state').innerHTML = "Connected"
+      }, false)
+
+      source.addEventListener('error', function (e) {
+        const id_state = document.getElementById('state')
+        if (e.eventPhase == EventSource.CLOSED)
+          source.close()
+        if (e.target.readyState == EventSource.CLOSED) {
+          id_state.innerHTML = "Disconnected"
+        }
+        else if (e.target.readyState == EventSource.CONNECTING) {
+          id_state.innerHTML = "Connecting..."
+        }
+      }, false)
+    } else {
+      console.log("Your browser doesn't support SSE")
+    }
+  </script>
+</head>
+
+<body>
+  <!-- jQuery first, then Tether, then Bootstrap JS. -->
+  <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"
+    integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"
+    integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"
+    integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
+    crossorigin="anonymous"></script>
+
+  <nav class="navbar navbar-expand-md navbar-dark bg-primary">
+    <!-- Navbar content -->
+    <span class="navbar-brand mb-0 h1">変更データキャプチャを試す</span>
+  </nav>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <div class="alert alert-primary" role="alert">
+          過去の変更履歴
+        </div>
+        <ul class="list-group" id="history">
+        </ul>
+      </div>
+      <div class="col-sm">
+        <div class="alert alert-dark" role="alert">
+          今回の変更内容詳細
+        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">フィールド</th>
+              <th scope="col">変更内容</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">1</th>
+              <td>取引先名</td>
+              <td id="name"></td>
+            </tr>
+            <tr>
+              <th scope="row">2</th>
+              <td>取引先部門</td>
+              <td id="site"></td>
+            </tr>
+            <tr>
+              <th scope="row">3</th>
+              <td>電話番号</td>
+              <td id="phone"></td>
+            </tr>
+            <tr>
+              <th scope="row">4</th>
+              <td>操作内容</td>
+              <td><span id="type"></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <div class="accordion" id="accordionExample">
+          <div class="card">
+            <div class="card-header" id="raw data">
+              <h2 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne"
+                  aria-expanded="true" aria-controls="collapseOne">
+                  rawデータ(json)
+                </button>
+              </h2>
+            </div>
+
+            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+              <div class="card-body" id="raw">
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header" id="Status">
+              <h2 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne"
+                  aria-expanded="true" aria-controls="collapseOne">
+                  ステータス
+                </button>
+              </h2>
+            </div>
+
+            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+              <div class="card-body">
+                SSE: <span id="state"></span><br />
+                status: <span id="status"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

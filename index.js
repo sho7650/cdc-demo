@@ -17,6 +17,7 @@ const TOKEN_ENDPOINT_URL = 'https://login.salesforce.com/services/oauth2/token';
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.use(express.static('public'))
 
 // const secret = process.env.PRIVATE_KEY;
 const secret = fs.readFileSync('./cert/server.key');
@@ -34,7 +35,7 @@ app.get('/api/accounts/events', (req, res) => {
     'Cache-Control': 'no-cache',
     'Connection': 'keep-alive'
   });
-  res.write("event: connected.\ndata:\n\n");
+  res.write("event: status\ndata: connected.\n\n");
 
   const token = jwt.sign(claim, secret, { algorithm: 'RS256' });
   const post = {
@@ -55,7 +56,7 @@ app.get('/api/accounts/events', (req, res) => {
       accessToken: ret.access_token,
       instanceUrl: ret.instance_url
     });
-    res.write("event: connected to Salesforce\ndata\n\n");
+    res.write("event: status\ndata: connected to Salesforce\n\n");
     conn.streaming.topic(process.env.TOPIC).subscribe((message) => {
       res.write(`data: ${JSON.stringify(message)}`);
       res.write("\n\n");
@@ -63,9 +64,10 @@ app.get('/api/accounts/events', (req, res) => {
   });
 });
 
-
+/*
 app.get('/', (req, res) => {
   res.render('index');
 });
+*/
 
 app.listen(process.env.PORT || 3000, () => console.log('starting with port 3000'));
