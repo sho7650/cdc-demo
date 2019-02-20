@@ -56,11 +56,15 @@ app.get('/api/accounts/events', (req, res) => {
       accessToken: ret.access_token,
       instanceUrl: ret.instance_url
     });
+    const ping = () => {
+      res.write("event: status\ndata: ping\n\n");
+    }
     res.write("event: status\ndata: connected to Salesforce\n\n");
     conn.streaming.topic(process.env.TOPIC).subscribe((message) => {
       res.write(`data: ${JSON.stringify(message)}`);
       res.write("\n\n");
     });
+    setInterval(ping, 45000);
   });
 });
 
