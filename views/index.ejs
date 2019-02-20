@@ -1,0 +1,54 @@
+<html>
+
+<head>
+  <script>
+    if (!!window.EventSource) {
+      var source = new EventSource('/api/accounts/events')
+
+      source.addEventListener('message', function (e) {
+        let data = JSON.parse(e.data);
+        document.getElementById('name').innerHTML = data.payload.Name
+        document.getElementById('site').innerHTML = data.payload.Site
+        document.getElementById('phone').innerHTML = data.payload.Phone
+        document.getElementById('type').innerHTML = data.payload.ChangeEventHeader.changeType
+        document.getElementById('raw').innerHTML = JSON.stringify(data, null, 2);
+      }, false)
+
+      source.addEventListener('event', function (e) {
+        document.getElementById('event').innerHTML = e.data
+      }, false)
+
+      source.addEventListener('open', function (e) {
+        document.getElementById('state').innerHTML = "Connected"
+      }, false)
+
+      source.addEventListener('error', function (e) {
+        const id_state = document.getElementById('state')
+        if (e.eventPhase == EventSource.CLOSED)
+          source.close()
+        if (e.target.readyState == EventSource.CLOSED) {
+          id_state.innerHTML = "Disconnected"
+        }
+        else if (e.target.readyState == EventSource.CONNECTING) {
+          id_state.innerHTML = "Connecting..."
+        }
+      }, false)
+    } else {
+      console.log("Your browser doesn't support SSE")
+    }
+  </script>
+</head>
+
+<body>
+  <h1>取引先名: <span id="name"></span></h1>
+  <h1>取引先部門名: <span id="site"></span></h1>
+  <h1>取引先名: <span id="phone"></span></h1>
+  <h2>指示内容: <span id="type"></span></h2>
+  <h2>raw data: <br />
+    <div id="raw"></div>
+  </h2>
+  <h3>SSE: <span id="state"></span></h3>
+  <h3>status: <span id="event"></span></h3>
+</body>
+
+</html>
