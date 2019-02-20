@@ -1,6 +1,5 @@
 'use strict';
 
-const fs = require('fs');
 var path = require('path');
 
 const jwt = require('jsonwebtoken');
@@ -19,8 +18,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(express.static('public'))
 
-// const secret = process.env.PRIVATE_KEY;
-const secret = fs.readFileSync('./cert/server.key');
+const secret = Buffer.from(process.env.PRIVATE_KEY.replace(/\\n/g, '\n'));
 const claim = {
   iss: process.env.ISSUER,
   aud: process.env.AUDIENCE,
