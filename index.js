@@ -19,12 +19,6 @@ app.set('view engine', 'ejs');
 app.use(express.static('public'))
 
 const secret = Buffer.from(process.env.PRIVATE_KEY.replace(/\\n/g, '\n'));
-const claim = {
-  iss: process.env.ISSUER,
-  aud: process.env.AUDIENCE,
-  sub: process.env.SUBJECT,
-  exp: Math.floor(Date.now() / 1000) + (3 * 60) // 3分
-};
 
 // server sent event
 app.get('/api/accounts/events', (req, res) => {
@@ -35,6 +29,12 @@ app.get('/api/accounts/events', (req, res) => {
   });
   res.write("event: status\ndata: connected.\n\n");
 
+  const claim = {
+    iss: process.env.ISSUER,
+    aud: process.env.AUDIENCE,
+    sub: process.env.SUBJECT,
+    exp: Math.floor(Date.now() / 1000) + (3 * 60) // 3分
+  };
   const token = jwt.sign(claim, secret, { algorithm: 'RS256' });
   const post = {
     method: 'POST',
