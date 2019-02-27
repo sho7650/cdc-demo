@@ -1,5 +1,9 @@
 'use strict';
 
+require('sqreen');
+require ('newrelic');
+require('appoptics-apm');
+
 var path = require('path');
 
 const jwt = require('jsonwebtoken');
