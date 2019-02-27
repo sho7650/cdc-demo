@@ -2,7 +2,7 @@
 
 require('sqreen');
 require ('newrelic');
-require('appoptics-apm');
+// require('appoptics-apm');
 
 var path = require('path');
 
