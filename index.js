@@ -31,6 +31,7 @@ app.get('/api/accounts/events', (req, res) => {
     'Cache-Control': 'no-cache',
     'Connection': 'keep-alive'
   });
+  let count = 1;
   res.write("event: status\ndata: connected.\n\n");
 
   const claim = {
@@ -59,7 +60,7 @@ app.get('/api/accounts/events', (req, res) => {
       instanceUrl: ret.instance_url
     });
     const ping = () => {
-      res.write("event: status\ndata: ping\n\n");
+      res.write(`event: status\ndata: ping - ${count++}\n\n`);
     }
     res.write("event: status\ndata: connected to Salesforce\n\n");
     conn.streaming.topic(process.env.TOPIC).subscribe((message) => {
