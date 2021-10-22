@@ -1,5 +1,8 @@
 'use strict';
 
+require('sqreen');
+require ('newrelic');
+
 var path = require('path');
 
 const jwt = require('jsonwebtoken');
