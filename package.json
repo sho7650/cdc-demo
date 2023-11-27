@@ -21,6 +21,6 @@
     "jsonwebtoken": "^8.5.1",
     "newrelic": "^8.5.0",
     "request": "^2.88.2",
-    "sqreen": "^1.64.2"
+    "sqreen": "^2.0.1"
   }
 }
